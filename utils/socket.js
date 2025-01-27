@@ -34,6 +34,10 @@ class LayerEdgeConnection {
                 });
                 return response;
             } catch (error) {
+                if (error.response.status === 404) {
+                    log.error(chalk.red(`Layer Edge connection failed wallet not registered yet...`));
+                    return 404;
+                }
                 if (i === retries - 1) {
                     log.error(`Max retries reached - Request failed:`, error.message);
                     if (this.proxy) {
@@ -143,6 +147,12 @@ class LayerEdgeConnection {
             "get",
             `https://referralapi.layeredge.io/api/light-node/node-status/${this.wallet.address}`
         );
+
+        if (response === 404) {
+            log.info("Node not found in this wallet, trying to regitering wallet...");
+            await this.registerWallet();
+            return false;
+        }
 
         if (response && response.data && response.data.data.startTimestamp !== null) {
             log.info("Node Status Running", response.data);
