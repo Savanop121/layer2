@@ -56,7 +56,7 @@ class LayerEdgeConnection {
 
         const response = await this.makeRequest(
             "post",
-            "https://referral-api.layeredge.io/api/referral/verify-referral-code",
+            "https://referralapi.layeredge.io/api/referral/verify-referral-code",
             { data: inviteData }
         );
 
@@ -76,7 +76,7 @@ class LayerEdgeConnection {
 
         const response = await this.makeRequest(
             "post",
-            `https://referral-api.layeredge.io/api/referral/register-wallet/${this.refCode}`,
+            `https://referralapi.layeredge.io/api/referral/register-wallet/${this.refCode}`,
             { data: registerData }
         );
 
@@ -101,7 +101,7 @@ class LayerEdgeConnection {
 
         const response = await this.makeRequest(
             "post",
-            `https://referral-api.layeredge.io/api/light-node/node-action/${this.wallet.address}/start`,
+            `https://referralapi.layeredge.io/api/light-node/node-action/${this.wallet.address}/start`,
             { data: dataSign }
         );
 
@@ -125,7 +125,7 @@ class LayerEdgeConnection {
 
         const response = await this.makeRequest(
             "post",
-            `https://referral-api.layeredge.io/api/light-node/node-action/${this.wallet.address}/stop`,
+            `https://referralapi.layeredge.io/api/light-node/node-action/${this.wallet.address}/stop`,
             { data: dataSign }
         );
 
@@ -141,7 +141,7 @@ class LayerEdgeConnection {
     async checkNodeStatus() {
         const response = await this.makeRequest(
             "get",
-            `https://referral-api.layeredge.io/api/light-node/node-status/${this.wallet.address}`
+            `https://referralapi.layeredge.io/api/light-node/node-status/${this.wallet.address}`
         );
 
         if (response && response.data && response.data.data.startTimestamp !== null) {
@@ -156,7 +156,7 @@ class LayerEdgeConnection {
     async checkNodePoints() {
         const response = await this.makeRequest(
             "get",
-            `https://referral-api.layeredge.io/api/referral/wallet-details/${this.wallet.address}`
+            `https://referralapi.layeredge.io/api/referral/wallet-details/${this.wallet.address}`
         );
 
         if (response && response.data) {
