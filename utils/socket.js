@@ -8,6 +8,10 @@ class LayerEdgeConnection {
     constructor(proxy = null, privateKey = null, refCode = "O8Ijyqih") {
         this.refCode = refCode;
         this.proxy = proxy;
+        this.headers = {
+            Accept: "application/json, text/plain, */*",
+            Origin: "https://dashboard.layeredge.io",
+        }
 
         this.axiosConfig = {
             ...(this.proxy && { httpsAgent: newAgent(this.proxy) }),
@@ -26,19 +30,24 @@ class LayerEdgeConnection {
     async makeRequest(method, url, config = {}, retries = 30) {
         for (let i = 0; i < retries; i++) {
             try {
+                const headers = { ...this.headers };
+                if (method.toUpperCase() === 'POST') {
+                    headers['Content-Type'] = 'application/json';
+                }
+
                 const response = await axios({
                     method,
                     url,
+                    headers,
                     ...this.axiosConfig,
                     ...config,
                 });
                 return response;
             } catch (error) {
-                if (error.response.status === 404) {
+                if (error?.response?.status === 404 || error?.status === 404) {
                     log.error(chalk.red(`Layer Edge connection failed wallet not registered yet...`));
                     return 404;
-                }
-                if (i === retries - 1) {
+                } else if (i === retries - 1) {
                     log.error(`Max retries reached - Request failed:`, error.message);
                     if (this.proxy) {
                         log.error(`Failed proxy: ${this.proxy}`, error.message);
