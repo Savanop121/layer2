@@ -47,6 +47,8 @@ class LayerEdgeConnection {
                 if (error?.response?.status === 404 || error?.status === 404) {
                     log.error(chalk.red(`Layer Edge connection failed wallet not registered yet...`));
                     return 404;
+                } else if (error?.response?.status === 405 || error?.status === 405) {
+                    return { data: 'Already CheckIn today' };
                 } else if (i === retries - 1) {
                     log.error(`Max retries reached - Request failed:`, error.message);
                     if (this.proxy) {
@@ -147,6 +149,32 @@ class LayerEdgeConnection {
             return true;
         } else {
             log.error("Failed to Stopping Node and claiming points");
+            return false;
+        }
+    }
+
+    async checkIN() {
+        const timestamp = Date.now();
+        const message = `I am claiming my daily node point for ${this.wallet.address} at ${timestamp}`;
+        const sign = await this.wallet.signMessage(message);
+
+        const dataSign = {
+            sign: sign,
+            timestamp: timestamp,
+            walletAddress: this.wallet.address
+        };
+
+        const response = await this.makeRequest(
+            "post",
+            `https://referralapi.layeredge.io/api/light-node/claim-node-points`,
+            { data: dataSign }
+        );
+
+        if (response && response.data) {
+            log.info("Daily Check in Result:", response.data);
+            return true;
+        } else {
+            log.error("Failed to perform check in...");
             return false;
         }
     }
