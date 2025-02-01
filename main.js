@@ -1,19 +1,22 @@
+
 import fs from 'fs/promises'
 import log from './utils/logger.js'
-import { readFile, delay } from './utils/helper.js'
+import { readFiles, delay } from './utils/helper.js'
 import banner from './utils/banner.js';
 import LayerEdge from './utils/socket.js';
+
+const WALLETS_PATH = 'wallets.json'  // change to walletsRef.json if you want to running ref wallets
 
 // Function to read wallets 
 async function readWallets() {
     try {
-        await fs.access("wallets.json");
+        await fs.access(WALLETS_PATH);
 
-        const data = await fs.readFile("wallets.json", "utf-8");
+        const data = await fs.readFile(WALLETS_PATH, "utf-8");
         return JSON.parse(data);
     } catch (err) {
         if (err.code === 'ENOENT') {
-            log.info("No wallets found in wallets.json");
+            log.info("No wallets found in", WALLETS_PATH);
             return [];
         }
         throw err;
@@ -24,7 +27,7 @@ async function run() {
     log.info(banner);
     await delay(3);
 
-    const proxies = await readFile('proxy.txt');
+    const proxies = await readFiles('proxy.txt');
     let wallets = await readWallets();
     if (proxies.length === 0) log.warn("No proxies found in proxy.txt - running without proxies");
     if (wallets.length === 0) {
