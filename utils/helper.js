@@ -18,7 +18,7 @@ export async function saveToFile(filename, data) {
 }
 
 // Read the file
-export async function readFile(pathFile) {
+export async function readFiles(pathFile) {
     try {
         const datas = await fs.readFile(pathFile, 'utf8');
         return datas.split('\n')
