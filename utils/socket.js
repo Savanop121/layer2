@@ -64,9 +64,9 @@ class LayerEdgeConnection {
         return null;
     }
 
-    async checkInvite() {
+    async checkInvite(invite_code) {
         const inviteData = {
-            invite_code: this.refCode,
+            invite_code,
         };
 
         const response = await this.makeRequest(
@@ -84,14 +84,14 @@ class LayerEdgeConnection {
         }
     }
 
-    async registerWallet() {
+    async registerWallet(invite_code) {
         const registerData = {
             walletAddress: this.wallet.address,
         };
 
         const response = await this.makeRequest(
             "post",
-            `https://referralapi.layeredge.io/api/referral/register-wallet/${this.refCode}`,
+            `https://referralapi.layeredge.io/api/referral/register-wallet/${invite_code}`,
             { data: registerData }
         );
 
@@ -206,12 +206,16 @@ class LayerEdgeConnection {
             `https://referralapi.layeredge.io/api/referral/wallet-details/${this.wallet.address}`
         );
 
-        if (response && response.data) {
-            log.info(`${this.wallet.address} Total Points:`, response.data.data?.nodePoints || 0);
-            return true;
+        if (response?.data?.data) {
+            const refCode = response.data.data.referralCode || null;
+            const referralCount = response.data?.data?.referrals?.length || 0;
+            const nodePoints = response.data.data.nodePoints ?? 0;
+
+            log.info(`${this.wallet.address} Total Points:`, nodePoints);
+            return { refCode, nodePoints, referralCount };
         } else {
             log.error("Failed to check Total Points..");
-            return false;
+            return { refCode: null, nodePoints: 0, referralCount: 0 };
         }
     }
 }
